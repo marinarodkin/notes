@@ -10,10 +10,10 @@ class App extends Component {
                  noteTags: ["receipt", "privat", "books"],
                  text: "my text"}
                ],
-         tags: [{tagName: "receipt", active: false},
-                {tagName: "privat", active: false},
-                {tagName: "work", active: false},
-                 {tagName: "books", active: false}],
+         tags: [{tagName: "receipt", active: false, filter: false},
+                {tagName: "privat", active: false, filter: false},
+                {tagName: "work", active: false, filter: false},
+                 {tagName: "books", active: false, filter: false}],
         newTitle: "",
         newText: "",
         newTags: [],
@@ -25,7 +25,7 @@ class App extends Component {
                 {tagName: "books", active: false}],
                };
   //startFindTag - index helps if had #tags before cut off piece with previous tags from beginning
-  // tagsForChoose - array with tags to choose during creating newNote
+  // tagsForChoose - array with tags to choose during creating newNote? сделать еще одно св-во активности в выборе
 
   onChangeTitle = ({ target: { value } }) => {
     this.setState({ newTitle: value });
@@ -53,13 +53,16 @@ class App extends Component {
       const tagFromText = this.getTagFromText(value);
       const { newTags } = this.state;
       const { tags} =  this.state;
-      const {tagsForChoose} = this.state;
+      //const {tagsForChoose} = this.state;
       const {newText} = this.state;
-      const newTagsForChoose = [...tagsForChoose, {tagName: tagFromText, active: true}];
+      //const newTagsForChoose = [...tagsForChoose, {tagName: tagFromText, active: true}];
       const newStartFindTag = newText.length; // cut off piece with previous tags from beginning
-      this.setState({ newText: value, newTags: [...newTags, {newTagName: tagFromText, active: true}],
-                      tags: [...tags, {tagName: tagFromText, active: false}], tagsForChoose: newTagsForChoose,
-                      newTag: "", startFindTag: newStartFindTag  });
+      //this.setState({ newText: value, newTags: [...newTags, {newTagName: tagFromText, active: true}],
+      //                tags: [...tags, {tagName: tagFromText, active: false}], tagsForChoose: newTagsForChoose,
+      //                newTag: "", startFindTag: newStartFindTag  });
+      this.setState({ newText: value, newTags: [...newTags, {tagName: tagFromText, active: true}],
+                                      tags: [...tags, {tagName: tagFromText, active: true, filter: false}],
+                                      newTag: "", startFindTag: newStartFindTag  });
       }
 
   }
@@ -69,31 +72,65 @@ class App extends Component {
     const { notes } = this.state;
     const {newTags} = this.state;
     const {tags} = this.state;
-    const newNoteTags = newTags.map(tag => tag.newTagName);
+    const newNoteTags = newTags.map(tag => tag.tagName);
     const newNote = {title: this.state.newTitle, noteTags: newNoteTags, text: this.state.newText };
-    this.setState({ newTitle: "", newText: "", newTags: [], notes: [...notes, newNote], tagsForChoose: tags });
-
+    const updatedTags = tags.map(tag => ({tagName: tag.tagName, active: false, filter: tag.filter}))
+    //this.setState({ newTitle: "", newText: "", newTags: [], notes: [...notes, newNote], tagsForChoose: tags });
+    this.setState({ newTitle: "", newText: "", newTags: [], notes: [...notes, newNote], tags: updatedTags });
+    //
   }
   onChangeOneTag = ({ target: { value } }) => {
     this.setState({ newTag: value });
   }
 
   onChangeTagCheckbox = ({ target: { id } }) => {
+      const { tags} =  this.state;  //
+      const clickedTag = tags.filter(tag => tag.tagName == id)
+      if (clickedTag[0].active == true) return;
       const { newTags } = this.state;
-      this.setState({ newTags: [...newTags, {newTagName:id, active: true}] });
-      const {tagsForChoose} = this.state;
-      const newTagsForChoose = tagsForChoose.filter(tag => tag.tagName !== id)
-      this.setState({ tagsForChoose: [...newTagsForChoose, {tagName: id, active: true}] })
+
+      const updatedTags = tags.filter(tag => tag.tagName != id);
+      const sortedTags = [...updatedTags, {tagName: id, active: true, filter: false} ].sort();
+      this.setState({ newTags: [...newTags, {tagName: id, active: true, filter: false}], tags: sortedTags, });
+      //const {tagsForChoose} = this.state;
+      //const newTagsForChoose = tagsForChoose.filter(tag => tag.tagName !== id)
+      //this.setState({ tagsForChoose: [...newTagsForChoose, {tagName: id, active: true}] })
 
   }
+  /*
+  onChangeTagCheckbox = ({ target: { id } }) => {
+      if (this.state.tags)
+      const { newTags } = this.state;
+      const { tags} =  this.state;  //
+      const updatedTags = tags.filter(tag => tag.tagName != id);
+      const sortedTags = [...updatedTags, {tagName:id, active: true, filter: false} ].sort();
+      this.setState({ newTags: [...newTags, {tagName:id, active: true, filter: false}], tags: sortedTags, });
+      //const {tagsForChoose} = this.state;
+      //const newTagsForChoose = tagsForChoose.filter(tag => tag.tagName !== id)
+      //this.setState({ tagsForChoose: [...newTagsForChoose, {tagName: id, active: true}] })
 
+  }
+  */
   addNewTag = () => {
     const { newTags } = this.state;
     const { tags} =  this.state;
-    const {tagsForChoose} = this.state;
-    const newTagsForChoose = [...tagsForChoose, {tagName: this.state.newTag, active: true}];
-    this.setState({ newTags: [...newTags, {newTagName: this.state.newTag, active: true}], tags: [...tags, {tagName:this.state.newTag, active: false}], tagsForChoose: newTagsForChoose, newTag: ""  });
+    //const {tagsForChoose} = this.state;
+    //const newTagsForChoose = [...tagsForChoose, {tagName: this.state.newTag, active: true}];
+    //this.setState({ newTags: [...newTags, {newTagName: this.state.newTag, active: true}], tags: [...tags, {tagName:this.state.newTag, active: false}], tagsForChoose: newTagsForChoose, newTag: ""  });
+    this.setState({ newTags: [...newTags, {tagName: this.state.newTag, active: true}], tags: [...tags, {tagName:this.state.newTag, active: true, filter: false}], newTag: ""  });
     }
+
+  deleteNote = ({ target: { id } }) => {
+
+    const { notes } = this.state;
+    const newNotes = notes.filter(note => note.title != id);
+    //console.log(newNotes)
+    this.setState({ notes: newNotes})
+  }
+
+  editNote = () => {
+    console.log("editing")
+  }
 
   render() {
       console.log("rendering App with this.state", this.state)
@@ -107,7 +144,8 @@ class App extends Component {
           <TagFilter tags = {this.state.tags} />
           <div className = "right-side">
             <div className = "addNoteBtn"></div>
-            <NoteCards notes = {this.state.notes} onChangeTitle = {this.onChangeTitle} newTitle ={this.state.newTitle}/>
+            <NoteCards notes = {this.state.notes} onChangeTitle = {this.onChangeTitle} newTitle ={this.state.newTitle}
+                       editNote = {this.editNote} deleteNote = {this.deleteNote} editNote = {this.editNote}/>
           </div>
           <div className="add">
             <AddNote onChangeTitle = {this.onChangeTitle} newTitle ={this.state.newTitle}
@@ -138,7 +176,7 @@ class TagFilter extends Component {
         <ul className = "tagsFilter_list">
           {this.props.tags.map(tag =>
             <li className = "tagsFilter" key = {tag.tagName}>
-              <input type = "checkbox" id={tag.tagName} className = "tagsFilter_checkbox " onChange = {this.props.onChange} checked = {tag.active} />
+              <input type = "checkbox" id={tag.tagName} className = "tagsFilter_checkbox " onChange = {this.props.onChange} checked = {tag.filter} />
               <label htmlFor = {tag.tagName} className = "tagsFilter_label">{tag.tagName}</label>
             </li>
             )}
@@ -153,7 +191,7 @@ class NoteCards extends Component {
     return(
     <div className = "notesContainer">
       {this.props.notes.map(note =>
-        <div className="note" key = {note.title}>
+        <div className="note" key = {note.title} onClick = {this.props.editNote} >
           <div className="note-tags">
               {note.noteTags.map(noteTag =>
                 <span className="note-tag" key = {noteTag}> {noteTag} </span>)}
@@ -161,8 +199,7 @@ class NoteCards extends Component {
           <h2 className="note-title">{note.title}</h2>
           <p className="note-text">{note.text}</p>
           <div className="note_btns">
-            <button className="note_btn note_btn--edit">Edit</button>
-            <button className="note_btn note_btn--delete">delete</button>
+            <button className="note_btn note_btn--delete" id = {note.title} onClick = {this.props.deleteNote}>delete</button>
           </div>
         </div>
       )}
@@ -186,7 +223,7 @@ class NoteCards extends Component {
               <textarea className="add-note_input-text" placeholder = "My text..." value ={this.props.newText}  onChange={this.props.onChangeText}/>
               <div className="add-note_tags-block">
                 Tags: {this.props.newTags.map(tag =>
-                <span className="add-note_newtags-block"> {tag.newTagName} </span>)}
+                <span className="add-note_newtags-block"> {tag.tagName} </span>)}
               </div>
                <button type="Add Note" className="btn add-note_btn">add</button>
                <ChooseTags onChangeOneTag = {this.props.onChangeOneTag} newTag = {this.props.newTag} tags = {this.props.tags}
@@ -209,7 +246,7 @@ class NoteCards extends Component {
             <input type="text" className="choose-tags_input-newtag" placeholder = "Type tag here" value ={this.props.newTag}  onChange={this.props.onChangeOneTag}/>
             <div className="choose-tags_newtag-plus" onClick = {this.props.addNewTag}>+ Add {this.props.newTag}</div>
             <div className="choose-tags_checkboxes">
-              {this.props.tagsForChoose.map(tag =>
+              {this.props.tags.map(tag =>
                 <li className = "choose-tags_list" key = {"choose-tags"+tag.tagName}>
                   <input type = "checkbox" id={tag.tagName} className = "choose-tags_checkbox " onChange = {this.props.onChangeTagCheckbox} checked = {tag.active} />
                   <label htmlFor = {tag.tagName} className = "choose-tags_label">{tag.tagName}</label>
@@ -220,3 +257,11 @@ class NoteCards extends Component {
     )
   }
 }
+
+/*
+{this.props.tagsForChoose.map(tag =>
+  <li className = "choose-tags_list" key = {"choose-tags"+tag.tagName}>
+    <input type = "checkbox" id={tag.tagName} className = "choose-tags_checkbox " onChange = {this.props.onChangeTagCheckbox} checked = {tag.active} />
+    <label htmlFor = {tag.tagName} className = "choose-tags_label">{tag.tagName}</label>
+  </li>
+)}*/
