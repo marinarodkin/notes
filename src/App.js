@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
+ import React, { Component } from 'react';
 import AddNote from "./Components/AddNote";
 import NoteCards from "./Components/NoteCards";
 import TagFilter from "./Components/TagFilter";
 import ChooseTags  from "./Components/ChooseTag";
-import './App.css';
+import CreateTag  from "./Components/CreateTag";
+import './App.scss';
+
 
 class App extends Component {
   state = {notes: [{title: "first note",
@@ -13,6 +15,8 @@ class App extends Component {
                  noteTags: ["receipt", "privat", "books"],
                  text: "my text"}
                ],
+
+                activeTag: "all",
          tags: [{tagName: "receipt", active: false, filter: false},
                 {tagName: "privat", active: false, filter: false},
                 {tagName: "work", active: false, filter: false},
@@ -22,12 +26,33 @@ class App extends Component {
         newTags: [],
         newTag: "",
         startFindTag: 0,
+        tagChange: false,
         noteStatus: "allNotes",
         showChooseTag: "choose-tag choose-tag--hidden",
         activeNote: {title: "first note",
                        noteTags: ["receipt", "privat", "work"],
                        text: "active note my text"} }
   //startFindTag - index helps if had #tags before cut off piece with previous tags from beginning
+  compareTags = (a, b) => {
+    if (a.tagName > b.tagName) return 1;
+    if (a.tagName < b.tagName) return -1;
+  }
+
+
+  showCreateTag = () => {
+    this.setState({tagChange: !this.state.tagChange})
+  }
+
+  onClickTagFilter = ({target: {id}}) => {
+    console.log("click");
+    //const { notes} =  this.state;
+    //let newSortedNotes;
+    if (this.state.noteStatus == "addNote" || this.state.noteStatus == "allNotes"){
+      this.setState({activeTag: id, newTags: [{tagName: id, active: true}]})
+    } else {
+    this.setState({activeTag: id})
+  }
+}
 
   onChangeTitle = ({ target: { value } }) => {
     this.setState({ newTitle: value });
@@ -63,6 +88,7 @@ class App extends Component {
   }
 
   onSubmitForm = (e) => {
+    console.log("blur")
     e.preventDefault();
     const { notes } = this.state;
     const {newTags} = this.state;
@@ -70,43 +96,70 @@ class App extends Component {
     const newNoteTags = newTags.map(tag => tag.tagName);
     const newNote = {title: this.state.newTitle, noteTags: newNoteTags, text: this.state.newText };
     const updatedTags = tags.map(tag => ({tagName: tag.tagName, active: false, filter: tag.filter}))
-    this.setState({ newTitle: "", newText: "", newTags: [], notes: [...notes, newNote], tags: updatedTags, noteStatus: "allNotes", });
+    let contentForNewTags = [];
+    if (this.state.activeTag != "all"){
+      contentForNewTags = [{tagName: this.state.activeTag, active: true}]
+    }
+    this.setState({ newTitle: "", newText: "", newTags: contentForNewTags, notes: [...notes, newNote], tags: updatedTags, noteStatus: "allNotes", });
     }
 
     onChangeOneTag = ({ target: { value } }) => {
+      if (this.state.newTag.length > 20) return;
       this.setState({ newTag: value });
     }
 
-  onChangeTagCheckbox = ({ target: { id } }) => {
+
+
+  onChangeTagCheckbox = (e) => {
+      e.stopPropagation()
+
+      let sortedTags;
+      const id = e.target.id.substring(3);
       const { tags} =  this.state;  //
-      const clickedTag = tags.filter(tag => tag.tagName == id)
-      if (clickedTag[0].active == true) return;
+      const clickedTag = tags.filter(tag => tag.tagName == id) //define clicked tag
       const { newTags } = this.state;
-      const updatedTags = tags.filter(tag => tag.tagName != id);
-      const sortedTags = [...updatedTags, {tagName: id, active: true, filter: false} ].sort();
-      this.setState({ newTags: [...newTags, {tagName: id, active: true, filter: false}], tags: sortedTags, });
+      const updatedTags = tags.filter(tag => tag.tagName != id); //cut clicked tag of tags arr in state
+      if (clickedTag[0].active == true) {
+        sortedTags = [...updatedTags, {tagName: id, active: false, filter: false} ].sort(this.compareTags);
+
+        const updatedNewTags = newTags.filter(tag => tag.tagName != id); //cut clicked tag of Newtags arr in state
+        this.setState({ newTags: [...updatedNewTags], tags: sortedTags, });
+      } else {
+        sortedTags = [...updatedTags, {tagName: id, active: true, filter: false} ].sort(this.compareTags);;
+        this.setState({ newTags: [...newTags, {tagName: id, active: true, filter: false}], tags: sortedTags, });
+        }
   }
 
   addNewTag = () => {
+    console.log("this.state.newTag ",  this.state.newTag);
+    if (this.state.newTag == "") return;
     const { newTags } = this.state;
     const { tags} =  this.state;
     this.setState({ newTags: [...newTags, {tagName: this.state.newTag, active: true}], tags: [...tags, {tagName:this.state.newTag, active: true, filter: false}], newTag: ""  });
     }
 
-  deleteNote = ({ target: { id } }) => {
+  deleteNote = (e) => {
+    e.stopPropagation()
+    const id = e.target.id;
     const { notes } = this.state;
     const newNotes = notes.filter(note => note.title != id);
     this.setState({ notes: newNotes})
   }
 
-  editNote = () => {
-    console.log("editing")
-    console.log(this.state.activeNote.noteTags);
-    const editedTags = this.state.activeNote.noteTags;
+
+
+  editNote = ({ target}) => {
+    const id = target.parentNode.id;
+    console.log(target.parentNode.id);
+    const { notes } = this.state;
+    const editedNote = notes.filter(note => note.title == id)[0]; //
+    console.log("id =", id, "editedNote", editedNote);
+    const restNotes = notes.filter(note => note.title !== id);
+    const editedTags = editedNote.noteTags;
     const updatedTags = editedTags.map(tag => {
     return {tagName: tag, active: true}
     });
-    this.setState({noteStatus: "editNote", newTitle: this.state.activeNote.title, newText: this.state.activeNote.text, newTags: updatedTags});
+    this.setState({noteStatus: "editNote", newTitle: editedNote.title, newText: editedNote.text, newTags: updatedTags, notes: restNotes});
     const { tags} =  this.state;
     const mapTags = tags.map(tag => {
       let tagActivity = false;
@@ -120,7 +173,14 @@ class App extends Component {
       return {tagName: tag.tagName, active: tagActivity, filter: false}
     });
     console.log("map tags!", mapTags)
-    this.setState({newTitle: this.state.activeNote.title, newText: this.state.activeNote.text, newTags: updatedTags, tags: mapTags});
+    this.setState({newTitle: editedNote.title, newText: editedNote.text, newTags: updatedTags, tags: mapTags});
+  }
+
+  deleteEditedNote = () => {
+    const id = this.state.activeNote.title;
+    const { notes } = this.state;
+    const newNotes = notes.filter(note => note.title != id);
+    this.setState({ notes: newNotes, noteStatus: "allNotes"})
   }
 
   tagAddClick = () => {
@@ -131,12 +191,48 @@ class App extends Component {
     this.setState({noteStatus: "addNote"})
   }
 
+  onClickHideChooseTag = (e) => {
+    e.preventDefault();
+    this.setState({showChooseTag: "choose-tag choose-tag--hidden"})
+  }
+
+  onFocusTag = ( {target } ) => {
+    console.log("onFocus");
+    const newTagContent = target.id + target.value
+  this.setState({ newTag: newTagContent });
+  }
+
+  onSumbmitCreateTag = (e) => {
+    e.preventDefault();
+    const { tags} =  this.state;
+    this.setState({ tags: [...tags, {tagName:this.state.newTag, active: true, filter: false}], newTag: ""  });
+    }
+
+
+
+
+  editTag = ( {target } ) => {
+    if (this.state.newTag == ""){
+      const newTagContent = target.id + target.value
+    this.setState({ newTag: newTagContent });
+    return
+  } else {
+    console.log("editingTag");
+    //if (this.state.newTag == "") return;if (this.state.newTag.length > 20) return;
+    this.setState({ newTag: target.value });
+    //console.log(id);
+    const { tags} =  this.state;
+    //this.setState({ newTag: id });
+    }
+  }
+
   render() {
+
       console.log("rendering App with this.state", this.state)
       let upperNote;
       if (this.state.noteStatus == "addNote") {
         upperNote = (
-        <div className = "addNote">
+        <div className = "add-note_up">
           <AddNote onChangeTitle = {this.onChangeTitle} newTitle ={this.state.newTitle}
                                     onChangeText = {this.onChangeText} newText ={this.state.newText}
                                     onChangeTags = {this.onChangeTags} newTags ={this.state.newTags}
@@ -148,13 +244,19 @@ class App extends Component {
                                     tagsForChoose = {this.state.tagsForChoose}
                                     tagAddClick = {this.tagAddClick}
                                     showChooseTag = {this.state.showChooseTag}
+                                    onClickHideChooseTag = {this.onClickHideChooseTag}
+                                    noteStatus = {this.state.noteStatus}
+                                    activeTag = {this.state.activeTag}
+
                                     />
         </div>)
       }
 
-      else if (this.state.noteStatus == "editNote"){
+      else if (this.state.noteStatus === "editNote"){
         upperNote = (
-        <div className = "edit"> <EditNote onChangeTitle = {this.onChangeTitle} newTitle ={this.state.newTitle}
+        <div className = "add-note_up add-note_up--edit">
+
+           <AddNote onChangeTitle = {this.onChangeTitle} newTitle ={this.state.newTitle}
                                   onChangeText = {this.onChangeText} newText ={this.state.newText}
                                   onChangeTags = {this.onChangeTags} newTags ={this.state.newTags}
                                   onSubmitForm = {this.onSubmitForm}
@@ -163,52 +265,42 @@ class App extends Component {
                                   onChangeTagCheckbox = {this.onChangeTagCheckbox}
                                   addNewTag =  {this.addNewTag}
                                   activeNote = {this.state.activeNote}
+                                  tagAddClick = {this.tagAddClick}
+                                  onClickHideChooseTag = {this.onClickHideChooseTag}
+                                  showChooseTag = {this.state.showChooseTag}
+                                  deleteEditedNote = {this.deleteEditedNote}
+                                  maskClass = "add-note_edit-mask"
 
-                                  />
+            />
       </div> )
     } else {
       upperNote = (
-        <div className = "addNoteBtn" onClick = {this.addNoteClick}>Take a note...</div>
+        <div className = "add-note_short" onClick = {this.addNoteClick}>
+            <textarea className="add-note_input-text add-note_input-text--short" placeholder = "Take a note..." disabled value ={this.props.newText}  onChange={this.props.onChangeText}/>
+          </div>
       )}
+
 
     return (
       <div className="App">
         <header>
-          <div className = "header"></div>
+          <div className = "header">
+            <div className="app-logo">Text Notes</div>
+          </div>
         </header>
-        <div className = "container">
-          <TagFilter tags = {this.state.tags} />
+        <div className = "app-container">
+          <TagFilter tags = {this.state.tags} showCreateTag = {this.showCreateTag} onClickTagFilter = {this.onClickTagFilter} activeTag = {this.state.activeTag}/>
           <div className = "notes-field">
             {upperNote}
             <NoteCards notes = {this.state.notes} onChangeTitle = {this.onChangeTitle} newTitle ={this.state.newTitle}
-                       editNote = {this.editNote} deleteNote = {this.deleteNote} />
+                       editNote = {this.editNote} deleteNote = {this.deleteNote} activeTag = {this.state.activeTag} />
           </div>
-          {/*
-          <div className="add">
-            <AddNote onChangeTitle = {this.onChangeTitle} newTitle ={this.state.newTitle}
-                                      onChangeText = {this.onChangeText} newText ={this.state.newText}
-                                      onChangeTags = {this.onChangeTags} newTags ={this.state.newTags}
-                                      onSubmitForm = {this.onSubmitForm}
-                                      onChangeOneTag = {this.onChangeOneTag} newTag = {this.state.newTag}
-                                      tags = {this.state.tags}
-                                      onChangeTagCheckbox = {this.onChangeTagCheckbox}
-                                      addNewTag =  {this.addNewTag}
-                                      tagsForChoose = {this.state.tagsForChoose}
-                                      />
-          </div>
-          <div className="edit">
-            <EditNote onChangeTitle = {this.onChangeTitle} newTitle ={this.state.newTitle}
-                                      onChangeText = {this.onChangeText} newText ={this.state.newText}
-                                      onChangeTags = {this.onChangeTags} newTags ={this.state.newTags}
-                                      onSubmitForm = {this.onSubmitForm}
-                                      onChangeOneTag = {this.onChangeOneTag} newTag = {this.state.newTag}
-                                      tags = {this.state.tags}
-                                      onChangeTagCheckbox = {this.onChangeTagCheckbox}
-                                      addNewTag =  {this.addNewTag}
-                                      activeNote = {this.state.activeNote}
-                                      />
-          </div>
-          */}
+          {this.state.tagChange === false ? null :
+          <CreateTag newTag = {this.props.newTag} onChangeOneTag = {this.onChangeOneTag} addNewTag = {this.addNewTag} tags = {this.state.tags}
+                               showCreateTag = {this.showCreateTag} editTag = {this.editTag} onFocusTag = {this.OnFocusTag}
+                             onSumbmitCreateTag ={this.onSumbmitCreateTag} />
+          }
+
         </div>
       </div>
     );

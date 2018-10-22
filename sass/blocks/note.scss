@@ -1,0 +1,76 @@
+
+.notesContainer{
+  width: 100%;
+  min-height: 60vh;
+  margin-right: 0 5vw;
+  border: 1px solid blue;
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: flex;
+  flex-wrap: wrap;
+
+  @media (min-width: $tablet-width){
+
+}
+}
+
+.note{
+  width: 200px;
+  height: 200px;
+  margin: 1vh 2vh;
+  padding: 2vh 2vh;
+  box-sizing: border-box;
+  text-align: left;
+  @include blocks;
+  position: relative;
+}
+
+.note_title{
+  font-size: 1.2em;
+  font-style: bold;
+  margin-bottom: 2vh;
+}
+
+.note_text{
+  font-size: 0.9em;
+  margin-bottom: 4vh;
+  min-height: 35%;
+  word-wrap: break-word;
+}
+
+.note_tag{
+  font-style: italic;
+  font-size: 0.5em;
+  background-color: $bg-hover;
+  padding: 0.5vh 1vh;
+  border-radius: 1.5vh;
+  margin-right: 1vh;
+
+}
+
+.note_btn{
+  position: absolute;
+  z-index: 3;
+  top: 175px;
+  left: 110px;
+  text-align: right;
+  border: none;
+  font-size: 0.8em;
+  background-color: $white;
+  color: $blue;
+  cursor: pointer;
+  &:hover{
+    color: $dark;
+  }
+}
+.note_edit-mask{
+  position: absolute;
+  width: 200px;
+  height: 180px;
+  top: 0;
+  left: 0;
+  opacity: .1;
+  background-color: white;
+  cursor: pointer;
+  z-index: 1;
+}

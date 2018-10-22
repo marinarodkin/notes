@@ -1,0 +1,74 @@
+.create-tag{
+  position: absolute;
+  top: 10%;
+  left: 30%;
+  width: 30vh;
+  min-height: 40vh;
+  @include blocks;
+  padding: 2vh 5vh;
+  z-index: 5;
+}
+
+.create-tag_title{
+  text-align: left;
+  font-size:1em;
+  margin-bottom: 2vh;
+}
+.create-tag_input-new{
+  display: flex;
+}
+.create-tag_input-newtag{
+  border: none;
+  width: 70%;
+  height: 4vh;
+  font-family: 'Questrial', sans-serif;
+  font-size: 0.8em;
+  &:focus{
+    border: none;
+    font-style: italic;
+    border: none;
+    outline: none;
+  }
+}
+
+  .create-tag_add-text{
+    color: $dark-blue;
+    font-size: 0.8em;
+    text-align: right;
+    margin-top: 1vh;
+    margin-left: auto;
+  }
+
+.create-tag_list{
+  margin-top: 3vh;
+}
+.create-tag_list-item{
+  list-style: none;
+  text-align: left;
+  margin-bottom: 1vh;
+  position: relative;
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: flex;
+  &::before{
+    position: absolute;
+    font-size: 0.8em;
+    content: "⨠";
+    width: 2vh;
+    height: 2vh;
+    top: .3vh;
+    left: -2vh;
+    color: $dark-blue;
+}
+}
+
+.create-tag_input{
+  font-size: 0.8em;
+  margin-left: 3vh;
+  position: relative;
+  border: none;
+  margin-bottom: 1.5vh;
+  font-family: 'Questrial', sans-serif;
+  font-size: 0.9em;
+  color: black;
+  }

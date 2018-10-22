@@ -1,0 +1,83 @@
+.add-note_up{
+  width: 100%;
+}
+
+.add-note{
+  width: 77vw;
+  min-height: 10vh;
+  margin: 3vh 2%;
+  @include blocks;
+  padding: 3vh 5vh;
+  position: relative;
+  box-sizing: border-box;
+  z-index: 1;
+  @media (min-width: $desktop-width){
+    width: 50vw;
+    margin: 3vh auto;
+}
+}
+
+.add-note_input-title{
+  display: block;
+  width: 100%;
+  border: none;
+  margin-bottom: 4vh;
+  font-size: 1.1em;
+  font-family: 'Questrial', sans-serif;
+  font-weight: bold;
+}
+.add-note_input-title:focus,
+.add-note_input-text:focus{
+  outline: none;
+}
+
+.add-note_input-text{
+  @extend .add-note_input-title;
+  font-size: 1em;
+  min-height: 50%;
+  font-family: 'Questrial', sans-serif;
+  font-weight: normal;
+}
+
+.add-note_tags-block{
+  width: 100%;
+  font-size: 0.9em;
+  text-align: left;
+  font-style: italic;
+  margin-bottom: 4vh;
+}
+
+.add-tag_btns{
+  display: -webkit-flex;
+  display: -ms-flex;
+  display: flex;
+  justify-content: flex-end;
+}
+.add-tag_btn{
+  display: block;
+  padding: 0.7vh 1vh;
+  background-color: white;
+  border: none;
+  margin-right: auto;
+  font-size:  0.9em;
+  color: $blue;
+  cursor: pointer;
+  font-style: italic;
+}
+.add-note_btn{
+  margin-left: 1vh;
+}
+.add-note_delete-btn{
+  margin-right: 3vh;
+
+}
+.add-note_short{
+  @extend .add-note;
+  min-height: 6vh;
+}
+
+.add-note_input-text--short{
+  min-height: 5%;
+  margin-bottom: 1px;
+  background-color: $white;
+}
