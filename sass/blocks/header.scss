@@ -1,8 +1,19 @@
 .app-logo{
-  font-family: 'Courgette', cursive;
-  font-size: 1.3em;
+  font-size: 1.4em;
   margin-left: 5vh;
   text-align: left;
-  padding-top: 1vh;
+  padding-top: 1.8vh;
+  padding-bottom: 1vh;
   color: $dark;
+  @media (min-width: $tablet-width){
+    font-size: 1.4em;
+  }
+
+  @media (min-width: $tablet-width){
+  font-size: 1.5em;
+  margin-left: 5vh;
+  text-align: left;
+  padding-top: 1.8vh;
+  color: $dark;
+ }
 }

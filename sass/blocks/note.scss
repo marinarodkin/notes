@@ -3,11 +3,13 @@
   width: 100%;
   min-height: 60vh;
   margin-right: 0 5vw;
-  border: 1px solid blue;
+  border: 3px dotted blue;
   display: -webkit-flex;
   display: -ms-flex;
   display: flex;
   flex-wrap: wrap;
+  
+
 
   @media (min-width: $tablet-width){
 
@@ -15,7 +17,8 @@
 }
 
 .note{
-  width: 200px;
+  min-width: 200px;
+  max-width: 270px;
   height: 200px;
   margin: 1vh 2vh;
   padding: 2vh 2vh;
@@ -23,18 +26,22 @@
   text-align: left;
   @include blocks;
   position: relative;
+  @media (min-width: $tablet-width){
+  width: 200px;
+}
 }
 
 .note_title{
-  font-size: 1.2em;
+  font-size: 1.0em;
   font-style: bold;
   margin-bottom: 2vh;
 }
 
 .note_text{
-  font-size: 0.9em;
+  font-size: 0.7em;
   margin-bottom: 4vh;
   min-height: 35%;
+  max-height: 45%;
   word-wrap: break-word;
 }
 

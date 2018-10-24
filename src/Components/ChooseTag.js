@@ -14,8 +14,8 @@ class ChooseTags extends Component {
       <div className="choose-tags">
         <h3 className="choose-tags_title">Note Tags:</h3>
         <input type="text" className="choose-tags_input-newtag" placeholder = "Type tag here:" value ={this.props.newTag}  onChange={this.props.onChangeOneTag}/>
-        {this.props.newTag == "" ? null : <div className="choose-tags_newtag-plus" onClick = {this.props.addNewTag}><span className = "choose-tags_add-text">+ Add:  </span> {this.props.newTag}</div>}
-        {this.props.newTag != "" ? null :
+        {this.props.newTag === "" ? null : <div className="choose-tags_newtag-plus" onClick = {this.props.addNewTag}><span className = "choose-tags_add-text">+ Add:  </span> {this.props.newTag}</div>}
+        {this.props.newTag !== "" ? null :
         <ul className="choose-tags_checkboxes-list">
           {tags.map(tag =>
             <li className = "choose-tags_list-item" key = {"choose-tags"+tag.tagName}>

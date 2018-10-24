@@ -1,7 +1,13 @@
 
 .tagsFilter{
-  width: 30%;
+  display: none;
+
+  @media (min-width: $tablet-width){
+  display: block;
+  min-width: 25%;
   padding: 3vh 0;
+  border: 2px dotted red;
+  }
 }
 
 .tagsFilter_list{

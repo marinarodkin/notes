@@ -2,10 +2,10 @@
 import AddNote from "./Components/AddNote";
 import NoteCards from "./Components/NoteCards";
 import TagFilter from "./Components/TagFilter";
-import ChooseTags  from "./Components/ChooseTag";
+//import ChooseTags  from "./Components/ChooseTag";
 import CreateTag  from "./Components/CreateTag";
 import './App.scss';
-
+//import update from 'immutability-helper';
 
 class App extends Component {
   state = {notes: [{title: "first note",
@@ -29,6 +29,7 @@ class App extends Component {
         tagChange: false,
         noteStatus: "allNotes",
         showChooseTag: "choose-tag choose-tag--hidden",
+        tagFilterClass: "tagsFilter",
         activeNote: {title: "first note",
                        noteTags: ["receipt", "privat", "work"],
                        text: "active note my text"} }
@@ -45,10 +46,24 @@ class App extends Component {
 
   onClickTagFilter = ({target: {id}}) => {
     console.log("click");
+    const { tags } =  this.state;
+    const { newTags } =  this.state;
+    console.log("clicked id", id, "tags", tags);
     //const { notes} =  this.state;
     //let newSortedNotes;
-    if (this.state.noteStatus == "addNote" || this.state.noteStatus == "allNotes"){
-      this.setState({activeTag: id, newTags: [{tagName: id, active: true}]})
+    if (this.state.noteStatus === "addNote" || this.state.noteStatus === "allNotes"){
+      const updatedTags = tags.map(tag => {
+        if (tag.tagName === id) {
+          return {tagName: tag.tagName, active: true, filtered: true}
+        } else {
+          return {tagName: tag.tagName, active: false, filtered: false}
+        }
+      });
+      let updatedNewTags
+      id === "all" ? updatedNewTags = [] : updatedNewTags = [{tagName: id, active: true}];
+      //const newTags = [...tags.filter(tag => tag.tagName != id), {tagName: id, active: true, filtered: true}];
+      console.log("newTags", updatedTags)
+      this.setState({activeTag: id, newTags: updatedNewTags, tags: updatedTags, showChooseTag: "choose-tag choose-tag--hidden"});
     } else {
     this.setState({activeTag: id})
   }
@@ -61,11 +76,11 @@ class App extends Component {
   //checking and getting tags from text by #
   getTagFromText  = (value) => {
   const str = value.substring(this.state.startFindTag);  //if  had #tags before cut off piece with previous tags from beginning
-  if (str.indexOf("#") == -1) {
+  if (str.indexOf("#") === -1) {
     return false
   }
   const restStr = str.substring(str.indexOf("#"));
-  if (restStr.indexOf(" ") == -1){
+  if (restStr.indexOf(" ") === -1){
     return false
   }
   return restStr.substring(1, restStr.indexOf(" "));
@@ -95,9 +110,14 @@ class App extends Component {
     const {tags} = this.state;
     const newNoteTags = newTags.map(tag => tag.tagName);
     const newNote = {title: this.state.newTitle, noteTags: newNoteTags, text: this.state.newText };
-    const updatedTags = tags.map(tag => ({tagName: tag.tagName, active: false, filter: tag.filter}))
+    const updatedTags = tags.map(tag => {
+      if (tag.tagName === this.state.activeTag){
+      return ({tagName: tag.tagName, active: true, filter: tag.filter})
+    }else {
+      return ({tagName: tag.tagName, active: false, filter: tag.filter})
+    } } )
     let contentForNewTags = [];
-    if (this.state.activeTag != "all"){
+    if (this.state.activeTag !== "all"){
       contentForNewTags = [{tagName: this.state.activeTag, active: true}]
     }
     this.setState({ newTitle: "", newText: "", newTags: contentForNewTags, notes: [...notes, newNote], tags: updatedTags, noteStatus: "allNotes", });
@@ -116,13 +136,13 @@ class App extends Component {
       let sortedTags;
       const id = e.target.id.substring(3);
       const { tags} =  this.state;  //
-      const clickedTag = tags.filter(tag => tag.tagName == id) //define clicked tag
+      const clickedTag = tags.filter(tag => tag.tagName === id) //define clicked tag
       const { newTags } = this.state;
-      const updatedTags = tags.filter(tag => tag.tagName != id); //cut clicked tag of tags arr in state
-      if (clickedTag[0].active == true) {
+      const updatedTags = tags.filter(tag => tag.tagName !== id); //cut clicked tag of tags arr in state
+      if (clickedTag[0].active === true) {
         sortedTags = [...updatedTags, {tagName: id, active: false, filter: false} ].sort(this.compareTags);
 
-        const updatedNewTags = newTags.filter(tag => tag.tagName != id); //cut clicked tag of Newtags arr in state
+        const updatedNewTags = newTags.filter(tag => tag.tagName !== id); //cut clicked tag of Newtags arr in state
         this.setState({ newTags: [...updatedNewTags], tags: sortedTags, });
       } else {
         sortedTags = [...updatedTags, {tagName: id, active: true, filter: false} ].sort(this.compareTags);;
@@ -132,7 +152,7 @@ class App extends Component {
 
   addNewTag = () => {
     console.log("this.state.newTag ",  this.state.newTag);
-    if (this.state.newTag == "") return;
+    if (this.state.newTag === "") return;
     const { newTags } = this.state;
     const { tags} =  this.state;
     this.setState({ newTags: [...newTags, {tagName: this.state.newTag, active: true}], tags: [...tags, {tagName:this.state.newTag, active: true, filter: false}], newTag: ""  });
@@ -142,7 +162,7 @@ class App extends Component {
     e.stopPropagation()
     const id = e.target.id;
     const { notes } = this.state;
-    const newNotes = notes.filter(note => note.title != id);
+    const newNotes = notes.filter(note => note.title !== id);
     this.setState({ notes: newNotes})
   }
 
@@ -152,7 +172,7 @@ class App extends Component {
     const id = target.parentNode.id;
     console.log(target.parentNode.id);
     const { notes } = this.state;
-    const editedNote = notes.filter(note => note.title == id)[0]; //
+    const editedNote = notes.filter(note => note.title === id)[0]; //
     console.log("id =", id, "editedNote", editedNote);
     const restNotes = notes.filter(note => note.title !== id);
     const editedTags = editedNote.noteTags;
@@ -165,9 +185,9 @@ class App extends Component {
       let tagActivity = false;
       editedTags.forEach(etag => {
         console.log("tag ", tag.tagName, "etag ", etag)
-        if (tag.tagName == etag){
+        if (tag.tagName === etag){
         tagActivity = true;
-        console.log(tag.tagName == etag)
+        console.log(tag.tagName === etag)
         }
       });
       return {tagName: tag.tagName, active: tagActivity, filter: false}
@@ -179,7 +199,7 @@ class App extends Component {
   deleteEditedNote = () => {
     const id = this.state.activeNote.title;
     const { notes } = this.state;
-    const newNotes = notes.filter(note => note.title != id);
+    const newNotes = notes.filter(note => note.title !== id);
     this.setState({ notes: newNotes, noteStatus: "allNotes"})
   }
 
@@ -188,7 +208,7 @@ class App extends Component {
   }
 
   addNoteClick = () => {
-    this.setState({noteStatus: "addNote"})
+    this.setState({noteStatus: "addNote", showChooseTag: "choose-tag choose-tag--hidden"})
   }
 
   onClickHideChooseTag = (e) => {
@@ -212,7 +232,7 @@ class App extends Component {
 
 
   editTag = ( {target } ) => {
-    if (this.state.newTag == ""){
+    if (this.state.newTag === ""){
       const newTagContent = target.id + target.value
     this.setState({ newTag: newTagContent });
     return
@@ -221,16 +241,42 @@ class App extends Component {
     //if (this.state.newTag == "") return;if (this.state.newTag.length > 20) return;
     this.setState({ newTag: target.value });
     //console.log(id);
-    const { tags} =  this.state;
+    //const { tags} =  this.state;
     //this.setState({ newTag: id });
     }
+  }
+
+  clickOnBody = ({target}) => {
+
+    const getParentNodeId = (clicked) => {
+      let res;
+      console.log("***!!! get parent node")
+      console.log("target - ", clicked, "target id -  ", clicked.id, "target.parentNode - ", clicked.parentNode, "target.class", target.class )
+      if (clicked.id.length > 2 ) {
+        console.log("target.id no false", clicked.id);
+        res =  clicked.id
+      } else {
+        console.log("else target.id ", clicked.id, "target.parentNode", clicked.parentNode)
+        getParentNodeId(clicked.parentNode);
+      }
+      return res;
+    }
+
+
+    if (this.state.noteStatus === "allNotes" ) {
+      return;
+    } else {
+      console.log("parNode ", getParentNodeId(target));
+
+    }
+    //  this.onSubmitForm(e);
   }
 
   render() {
 
       console.log("rendering App with this.state", this.state)
       let upperNote;
-      if (this.state.noteStatus == "addNote") {
+      if (this.state.noteStatus === "addNote") {
         upperNote = (
         <div className = "add-note_up">
           <AddNote onChangeTitle = {this.onChangeTitle} newTitle ={this.state.newTitle}
@@ -282,7 +328,7 @@ class App extends Component {
 
 
     return (
-      <div className="App">
+      <div className="App" onClick = {this.clickOnBody}>
         <header>
           <div className = "header">
             <div className="app-logo">Text Notes</div>
@@ -308,49 +354,6 @@ class App extends Component {
 }
 
 export default App;
-
-class EditNote extends Component {
-
-  render() {
-    console.log()
-    return(
-      <div className="edit-note">
-        <form action="" className="add-note_form"  onSubmit={this.props.onSubmitForm} >
-          <div className="add-note_form-group">
-            <input type="text" className="add-note_input-title" placeholder = {this.props.activeNote.title} value ={this.props.newTitle}  onChange={this.props.onChangeTitle}/>
-            <textarea className="add-note_input-text" placeholder = {this.props.activeNote.text} value ={this.props.newText}  onChange={this.props.onChangeText}/>
-            <div className="add-note_tags-block">
-              Tags: {this.props.newTags.map(tag =>
-              <span className="add-note_newtags-block"> {tag.tagName} </span>)}
-            </div>
-             <button type="Add Note" className="btn add-note_btn">edit</button>
-             <ChooseTags onChangeOneTag = {this.props.onChangeOneTag} newTag = {this.props.newTag} tags = {this.props.tags}
-                                          onChangeTagCheckbox = {this.props.onChangeTagCheckbox}
-                                          addNewTag =  {this.props.addNewTag}  />
-          </div>
-        </form>
-      </div>
-
-    )}
-  }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
 class TagFilter extends Component {

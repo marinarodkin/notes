@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ChooseTags  from "./ChooseTag";
 
+
 class AddNote extends Component {
 
 
@@ -9,7 +10,7 @@ class AddNote extends Component {
     let buttonSubmitText;
     let editClass;
 
-    if (this.props.noteStatus == "addNote"){
+    if (this.props.noteStatus === "addNote"){
        buttonTagText = "add tags";
        buttonSubmitText = "ADD NOTE";
 
@@ -23,19 +24,19 @@ class AddNote extends Component {
 
 
     return(
-      <div className="add-note">
+      <div className="add-note" id = "add-note">
         <div className={editClass}></div>
         <form action="" className="add-note_form"  onSubmit={this.props.onSubmitForm} >
           <div className="add-note_form-group">
-            <input type="text" className="add-note_input-title" placeholder = "Title"  value ={this.props.newTitle}  onChange={this.props.onChangeTitle}/>
-            <textarea className="add-note_input-text" placeholder = "Take a note..." autoFocus={true} value ={this.props.newText}   onChange={this.props.onChangeText} autofocus/>
+            <input type="text" className="add-note_input-title" placeholder = "Title"  value ={this.props.newTitle}  onChange={this.props.onChangeTitle} />
+            <textarea className="add-note_input-text" placeholder = "Take a note..." autoFocus={true} value ={this.props.newText}   onChange={this.props.onChangeText} />
             <div className="add-note_tags-block">
-              {this.props.newTags.length == 0 ? null : <b>Tags:</b>} {this.props.newTags.map(tag =>
-              <span className="add-note_newtags-block">  {tag.tagName}  </span>)}
+              {this.props.newTags.length === 0  ? null : <b>Tags:</b>} {this.props.newTags.map((tag, index) =>
+              <span className="add-note_newtags-block" key = {tag.tagName + index}>  {tag.tagName}  </span>)}
             </div>
             <div className="add-tag_btns">
                <button type="button" className="add-tag_btn" onClick = {this.props.tagAddClick}>{buttonTagText}</button>
-               {this.props.noteStatus == "addNote" ? null : <button type="button" className="btn add-note_delete-btn" onClick = {this.props.deleteEditedNote}>Delete</button>}
+               {this.props.noteStatus === "addNote" ? null : <button type="button" className="btn add-note_delete-btn" onClick = {this.props.deleteEditedNote}>Delete</button>}
                <button type="submit" className="btn add-note_btn">{buttonSubmitText}</button>
             </div>
               <div className = {this.props.showChooseTag}>

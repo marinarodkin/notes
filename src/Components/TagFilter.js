@@ -7,14 +7,14 @@ class TagFilter extends Component {
   }
   classForTag = (tag) => {
     console.log("activeTag ", this.props.activeTag, "tag.tagname ", tag.tagname)
-    if (tag.tagName == this.props.activeTag) {
+    if (tag.tagName === this.props.activeTag) {
       return "tagsFilter_item tagsFilter_item--active"
     } else  {
       return "tagsFilter_item";
     }
   }
   classForTagAll = () => {
-    if (this.props.activeTag == "all"){
+    if (this.props.activeTag === "all"){
       return "tagsFilter_item tagsFilter_item--all tagsFilter_item--active"
     } else  {
       return "tagsFilter_item tagsFilter_item--all";
